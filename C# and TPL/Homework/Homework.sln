@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Word Analyzer - non-threade
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Word Analyzer - multi-threaded", "Word Analyzer - multi-threaded\Word Analyzer - multi-threaded.csproj", "{0B63BA59-BC52-459C-BD3F-1A0C9F949A96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Image Downsizer", "Image Downsizer\Image Downsizer.csproj", "{0A8AC369-0155-4423-84B3-9768AB5750A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Image Downsizer", "Image Downsizer\Image Downsizer.csproj", "{0A8AC369-0155-4423-84B3-9768AB5750A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Area51", "Area51\Area51.csproj", "{A76ABB75-C733-4C31-8583-FF1434408EAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{0A8AC369-0155-4423-84B3-9768AB5750A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A8AC369-0155-4423-84B3-9768AB5750A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A8AC369-0155-4423-84B3-9768AB5750A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A76ABB75-C733-4C31-8583-FF1434408EAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A76ABB75-C733-4C31-8583-FF1434408EAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A76ABB75-C733-4C31-8583-FF1434408EAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A76ABB75-C733-4C31-8583-FF1434408EAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
