@@ -7,7 +7,7 @@ public class DBConnection {
     static Connection getConnection(){
         try {
             Class.forName("org.h2.Driver");
-            conn = DriverManager.getConnection("jdbc:h2:tcp://localhost/D:\\Java Practice\\SchoolDB","sa","k123456");
+            conn = DriverManager.getConnection("jdbc:h2:tcp://localhost/D:\\University\\Java Practice\\SchoolDB","sa","k123456");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } catch (SQLException e) {

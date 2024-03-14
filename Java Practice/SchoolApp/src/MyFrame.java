@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -54,7 +56,26 @@ public class MyFrame extends JFrame {
         addButton.addActionListener(new AddAction());
 
         midPanel.add(deleteButton);
+        deleteButton.addActionListener(new DeleteAction());
+
         midPanel.add(editButton);
+
+        midPanel.add(searchBtn);
+        searchBtn.addActionListener(new SearchAction());
+
+        midPanel.add(refreshBtn);
+        refreshBtn.addActionListener(new RefreshAction());
+
+        midPanel.add(studentComboBox);
+
+        midPanel.add(courseBtn);
+        courseBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CourseFrame courseFrame = new CourseFrame();
+            }
+        });
+
 
         this.add(midPanel);
 
@@ -64,7 +85,10 @@ public class MyFrame extends JFrame {
 
         this.add(downPanel);
 
+        table.addMouseListener(new MouseAction());
+
         refreshTable();
+        refreshStudentCombo();
 
         this.setVisible(true);
     }
@@ -103,11 +127,15 @@ public class MyFrame extends JFrame {
     //Gender combo box
     String[] genderInfo = {"Мъж", "Жена"};
     JComboBox<String> genderComboBox = new JComboBox<>(genderInfo);
+    JComboBox<String> studentComboBox = new JComboBox<String>();
 
     //Buttons
     JButton addButton = new JButton("Добавяне");
     JButton deleteButton = new JButton("Изтриване");
     JButton editButton = new JButton("Редактиране");
+    JButton searchBtn = new JButton("Търсене по години");
+    JButton refreshBtn = new JButton("Обнови");
+    JButton courseBtn = new JButton("Курсове");
 
     JTable table = new JTable();
     JScrollPane myScroll = new JScrollPane(table);
@@ -122,6 +150,7 @@ public class MyFrame extends JFrame {
     Connection conn = null;
     PreparedStatement statement = null;
     ResultSet result = null;
+    int id=-1;
 
     static class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
         private final String datePattern = "yyyy-MM-dd";
@@ -176,6 +205,110 @@ public class MyFrame extends JFrame {
         }
     }
 
+    class EditAction implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TO DO
+        }
+    }
+
+    class DeleteAction implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            conn = DBConnection.getConnection();
+            String sql = "delete from student where STUDENTID = ?";
+
+            try {
+                statement = conn.prepareStatement(sql);
+                statement.setInt(1,id);
+                statement.execute();
+                refreshTable();
+                refreshStudentCombo();
+                clearForm();
+                id=-1;
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    class SearchAction implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            conn = DBConnection.getConnection();
+            String sql = "select * from student where age = ?";
+            try {
+                statement = conn.prepareStatement(sql);
+                statement.setInt(1,Integer.parseInt(ageTF.getText()));
+                result = statement.executeQuery();
+                table.setModel(new MyModel(result));
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    class RefreshAction implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+
+            refreshTable();
+            clearForm();
+        }
+    }
+
+    class MouseAction implements MouseListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            int row = table.getSelectedRow();
+            id = Integer.parseInt(table.getValueAt(row,0).toString());
+            firstNameTF.setText(table.getValueAt(row, 1).toString());
+            lastNameTF.setText(table.getValueAt(row, 2).toString());
+            ageTF.setText(table.getValueAt(row,3).toString());
+            addressTF.setText((table.getValueAt(row, 6).toString()));
+            cityTF.setText((table.getValueAt(row, 7).toString()));
+            stateTF.setText((table.getValueAt(row, 8).toString()));
+            postalCodeTF.setText((table.getValueAt(row, 9).toString()));
+            countryTF.setText((table.getValueAt(row, 10).toString()));
+            emailTF.setText((table.getValueAt(row, 11).toString()));
+            phoneTF.setText((table.getValueAt(row, 12).toString()));
+            if(table.getValueAt(row, 5).toString().equals("Мъж")){
+                genderComboBox.setSelectedIndex(0);
+            }
+            else {
+                genderComboBox.setSelectedIndex(1);
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
+    }
+
     public void refreshTable() {
         conn=DBConnection.getConnection();
 
@@ -206,6 +339,26 @@ public class MyFrame extends JFrame {
         phoneTF.setText("");
         datePicker.getModel().setValue(null);
         genderComboBox.setSelectedIndex(0);
+    }
+
+    public void refreshStudentCombo() {
+        studentComboBox.removeAllItems();
+        conn=DBConnection.getConnection();
+        String sql="select STUDENTID, firstName, lastName, age, dateOfBirth, gender, address, city, state, postalCode, country, email, phone";
+        String item="";
+        try {
+            statement=conn.prepareStatement(sql);
+            result=statement.executeQuery();
+            while(result.next()) {
+                item=result.getObject(1).toString()+"." + result.getObject(2) + " " + result.getObject(3) + " " + result.getObject(4) + " " + result.getObject(5)
+                        + " " + result.getObject(6) + " " + result.getObject(7) + " " + result.getObject(8) + " " + result.getObject(9) + " " + result.getObject(10)
+                        + " " + result.getObject(11) + " " + result.getObject(12) + " " + result.getObject(13);
+                studentComboBox.addItem(item);
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
 

@@ -1,0 +1,20 @@
+2024-03-14 18:26:22.208000+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Schema "SCHOOLDB" not found; SQL statement:
+USE SchoolDB [90079-224]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:644)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.engine.Database.getSchema(Database.java:1578)
+	at org.h2.command.dml.Set.update(Set.java:397)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:169)
+	at org.h2.command.Command.executeUpdate(Command.java:256)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:262)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:231)
+	at org.h2.server.web.WebApp.getResult(WebApp.java:1345)
+	at org.h2.server.web.WebApp.query(WebApp.java:1143)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1109)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1096)
+	at org.h2.server.web.WebThread.process(WebThread.java:190)
+	at org.h2.server.web.WebThread.run(WebThread.java:103)
+	at java.lang.Thread.run(Unknown Source)
