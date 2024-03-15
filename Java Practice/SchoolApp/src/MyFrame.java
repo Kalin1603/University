@@ -59,6 +59,7 @@ public class MyFrame extends JFrame {
         deleteButton.addActionListener(new DeleteAction());
 
         midPanel.add(editButton);
+        editButton.addActionListener(new EditAction());
 
         midPanel.add(searchBtn);
         searchBtn.addActionListener(new SearchAction());
@@ -69,6 +70,7 @@ public class MyFrame extends JFrame {
         midPanel.add(studentComboBox);
 
         midPanel.add(courseBtn);
+        midPanel.add(enrollmentBtn);
         courseBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -76,6 +78,12 @@ public class MyFrame extends JFrame {
             }
         });
 
+        enrollmentBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EnrollmentFrame enrollmentFrame = new EnrollmentFrame();
+            }
+        });
 
         this.add(midPanel);
 
@@ -136,7 +144,7 @@ public class MyFrame extends JFrame {
     JButton searchBtn = new JButton("Търсене по години");
     JButton refreshBtn = new JButton("Обнови");
     JButton courseBtn = new JButton("Курсове");
-
+    JButton enrollmentBtn = new JButton("Записвания");
     JTable table = new JTable();
     JScrollPane myScroll = new JScrollPane(table);
 
