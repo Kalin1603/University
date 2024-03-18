@@ -13,7 +13,7 @@ public class CourseFrame extends JFrame {
         this.setLayout(new GridLayout(3, 1));
 
         //upPanel--------------------------------------
-        upPanel.setLayout(new GridLayout(4, 2));
+        upPanel.setLayout(new GridLayout(5, 2));
         upPanel.add(courseName);
         upPanel.add(courseNameTF);
         upPanel.add(instructor);
@@ -22,6 +22,7 @@ public class CourseFrame extends JFrame {
         upPanel.add(creditsTF);
         upPanel.add(description);
         upPanel.add(descriptionTF);
+        upPanel.add(studentComboBox);
 
         this.add(upPanel);
 
@@ -48,6 +49,7 @@ public class CourseFrame extends JFrame {
         this.add(downPanel);
 
         refreshCourseTable();
+        refreshStudentCombo();
 
         this.setVisible(true);
     }
@@ -79,6 +81,9 @@ public class CourseFrame extends JFrame {
     JTable courseTable = new JTable();
     JScrollPane myScroll = new JScrollPane(courseTable);
 
+
+    JComboBox<String> studentComboBox = new JComboBox<String>();
+
     //Database connection
     Connection conn = null;
     PreparedStatement statement = null;
@@ -90,14 +95,15 @@ public class CourseFrame extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             conn = DBConnection.getConnection();
-            String sql = "insert into course(courseName, instructor, credits, description) values(?, ?, ?, ?)";
+            String sql = "INSERT INTO course(courseName, instructor, credits, description) VALUES(?, ?, ?, ?)";
             try {
                 statement = conn.prepareStatement(sql);
                 statement.setString(1, courseNameTF.getText());
                 statement.setString(2, instructorTF.getText());
                 statement.setInt(3, Integer.parseInt(creditsTF.getText()));
                 statement.setString(4, descriptionTF.getText());
-                statement.execute();
+                statement.executeUpdate();
+
                 refreshCourseTable();
                 clearForm();
 
@@ -108,6 +114,7 @@ public class CourseFrame extends JFrame {
             }
         }
     }
+
 
     class EditAction implements ActionListener {
 
@@ -129,6 +136,7 @@ public class CourseFrame extends JFrame {
                 statement.setInt(1,id);
                 statement.execute();
                 refreshCourseTable();
+                refreshStudentCombo();
                 clearForm();
                 id=-1;
             } catch (SQLException ex) {
@@ -170,10 +178,11 @@ public class CourseFrame extends JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             int row = courseTable.getSelectedRow();
-            courseNameTF.setText(courseTable.getValueAt(row, 0).toString());
-            instructorTF.setText(courseTable.getValueAt(row, 1).toString());
-            creditsTF.setText(courseTable.getValueAt(row,2).toString());
-            descriptionTF.setText((courseTable.getValueAt(row, 3).toString()));
+            id = Integer.parseInt(courseTable.getValueAt(row, 0).toString());
+            courseNameTF.setText(courseTable.getValueAt(row, 1).toString());
+            instructorTF.setText(courseTable.getValueAt(row, 2).toString());
+            creditsTF.setText(courseTable.getValueAt(row,3).toString());
+            descriptionTF.setText((courseTable.getValueAt(row, 4).toString()));
         }
 
         @Override
@@ -200,7 +209,11 @@ public class CourseFrame extends JFrame {
     public void refreshCourseTable() {
         conn = DBConnection.getConnection();
         try {
-            statement = conn.prepareStatement("SELECT COURSENAME, INSTRUCTOR, CREDITS, DESCRIPTION FROM course");
+            statement = conn.prepareStatement("SELECT C.COURSEID, S.STUDENTID, S.FIRSTNAME, S.LASTNAME, C.COURSENAME, C.INSTRUCTOR, C.CREDITS, C.DESCRIPTION " +
+                    "FROM COURSE AS C " +
+                    "JOIN ENROLLMENT AS E ON E.COURSEID = C.COURSEID " +
+                    "JOIN STUDENT AS S ON S.STUDENTID = E.STUDENTID");
+
             result = statement.executeQuery();
             courseTable.setModel(new MyModel(result));
         } catch (SQLException e) {
@@ -210,10 +223,30 @@ public class CourseFrame extends JFrame {
         }
     }
 
+
     public void clearForm() {
         courseNameTF.setText("");
         instructorTF.setText("");
         creditsTF.setText("");
         descriptionTF.setText("");
+    }
+
+    public void refreshStudentCombo() {
+        studentComboBox.removeAllItems();
+        conn = DBConnection.getConnection();
+        String sql = "SELECT STUDENTID, firstName, lastName FROM student";
+        try {
+            statement = conn.prepareStatement(sql);
+            result = statement.executeQuery();
+            while (result.next()) {
+                int studentId = result.getInt("STUDENTID");
+                String firstName = result.getString("firstName");
+                String lastName = result.getString("lastName");
+                String fullName = studentId + "." + firstName + " " + lastName;
+                studentComboBox.addItem(fullName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

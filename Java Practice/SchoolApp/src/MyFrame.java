@@ -67,8 +67,6 @@ public class MyFrame extends JFrame {
         midPanel.add(refreshBtn);
         refreshBtn.addActionListener(new RefreshAction());
 
-        midPanel.add(studentComboBox);
-
         midPanel.add(courseBtn);
         midPanel.add(enrollmentBtn);
         courseBtn.addActionListener(new ActionListener() {
@@ -96,7 +94,6 @@ public class MyFrame extends JFrame {
         table.addMouseListener(new MouseAction());
 
         refreshTable();
-        refreshStudentCombo();
 
         this.setVisible(true);
     }
@@ -135,7 +132,6 @@ public class MyFrame extends JFrame {
     //Gender combo box
     String[] genderInfo = {"Мъж", "Жена"};
     JComboBox<String> genderComboBox = new JComboBox<>(genderInfo);
-    JComboBox<String> studentComboBox = new JComboBox<String>();
 
     //Buttons
     JButton addButton = new JButton("Добавяне");
@@ -233,7 +229,6 @@ public class MyFrame extends JFrame {
                 statement.setInt(1,id);
                 statement.execute();
                 refreshTable();
-                refreshStudentCombo();
                 clearForm();
                 id=-1;
             } catch (SQLException ex) {
@@ -349,25 +344,7 @@ public class MyFrame extends JFrame {
         genderComboBox.setSelectedIndex(0);
     }
 
-    public void refreshStudentCombo() {
-        studentComboBox.removeAllItems();
-        conn=DBConnection.getConnection();
-        String sql="select STUDENTID, firstName, lastName, age, dateOfBirth, gender, address, city, state, postalCode, country, email, phone";
-        String item="";
-        try {
-            statement=conn.prepareStatement(sql);
-            result=statement.executeQuery();
-            while(result.next()) {
-                item=result.getObject(1).toString()+"." + result.getObject(2) + " " + result.getObject(3) + " " + result.getObject(4) + " " + result.getObject(5)
-                        + " " + result.getObject(6) + " " + result.getObject(7) + " " + result.getObject(8) + " " + result.getObject(9) + " " + result.getObject(10)
-                        + " " + result.getObject(11) + " " + result.getObject(12) + " " + result.getObject(13);
-                studentComboBox.addItem(item);
-            }
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+
 }
 
 

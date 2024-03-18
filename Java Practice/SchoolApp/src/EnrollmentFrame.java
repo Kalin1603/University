@@ -193,7 +193,8 @@ public class EnrollmentFrame extends JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             int row = enrollmentTable.getSelectedRow();
-            gradeTF.setText(enrollmentTable.getValueAt(row,2).toString());
+            id = Integer.parseInt(enrollmentTable.getValueAt(row, 0).toString());
+            gradeTF.setText(enrollmentTable.getValueAt(row,1).toString());
         }
 
         @Override
@@ -220,7 +221,7 @@ public class EnrollmentFrame extends JFrame {
     public void refreshEnrollmentTable() {
         conn = DBConnection.getConnection();
         try {
-            statement = conn.prepareStatement("SELECT ENROLLMENTDATE, GRADE FROM ENROLLMENT");
+            statement = conn.prepareStatement("SELECT * FROM ENROLLMENT");
             result = statement.executeQuery();
             enrollmentTable.setModel(new MyModel(result));
         } catch (SQLException e) {
