@@ -104,6 +104,21 @@ public class CourseFrame extends JFrame {
                 statement.setString(4, descriptionTF.getText());
                 statement.executeUpdate();
 
+                // Вземане на избраната стойност от комбобокса
+                String fullName = (String) studentComboBox.getSelectedItem();
+
+                // Разделяне на "studentId", "firstName" и "lastName"
+                String[] parts = fullName.split("\\.");
+                int studentId = Integer.parseInt(parts[0]);
+                String firstName = parts[1].trim().split(" ")[0];
+                String lastName = parts[1].trim().split(" ")[1];
+
+                // Вмъкване на данните в таблицата
+                String insertStudentSql = "INSERT INTO enrollment(studentId, courseId) VALUES (?, LAST_INSERT_ID())";
+                PreparedStatement insertStudentStatement = conn.prepareStatement(insertStudentSql);
+                insertStudentStatement.setInt(1, studentId);
+                insertStudentStatement.executeUpdate();
+
                 refreshCourseTable();
                 clearForm();
 
@@ -114,6 +129,8 @@ public class CourseFrame extends JFrame {
             }
         }
     }
+
+
 
 
     class EditAction implements ActionListener {

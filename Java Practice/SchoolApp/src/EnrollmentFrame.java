@@ -25,6 +25,8 @@ public class EnrollmentFrame extends JFrame {
         upPanel.add(datePicker);
         upPanel.add(grade);
         upPanel.add(gradeTF);
+        upPanel.add(studentComboBox);
+        upPanel.add(courseComboBox);
 
         this.add(upPanel);
 
@@ -51,6 +53,8 @@ public class EnrollmentFrame extends JFrame {
 
         downPanel.add(myScroll);
         refreshEnrollmentTable();
+        refreshStudentCombo();
+        refreshCourseCombo();
 
         this.setVisible(true);
     }
@@ -76,6 +80,10 @@ public class EnrollmentFrame extends JFrame {
 
     JTable enrollmentTable = new JTable();
     JScrollPane myScroll = new JScrollPane(enrollmentTable);
+
+    JComboBox<String> studentComboBox = new JComboBox<String>();
+    JComboBox<String> courseComboBox = new JComboBox<String>();
+
 
     //Database connection
     Connection conn = null;
@@ -152,6 +160,8 @@ public class EnrollmentFrame extends JFrame {
                 statement.setInt(1,id);
                 statement.execute();
                 refreshEnrollmentTable();
+                refreshStudentCombo();
+                refreshCourseCombo();
                 clearForm();
                 id=-1;
             } catch (SQLException ex) {
@@ -228,6 +238,44 @@ public class EnrollmentFrame extends JFrame {
             e.printStackTrace();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void refreshStudentCombo() {
+        studentComboBox.removeAllItems();
+        conn = DBConnection.getConnection();
+        String sql = "SELECT STUDENTID, firstName, lastName FROM student";
+        try {
+            statement = conn.prepareStatement(sql);
+            result = statement.executeQuery();
+            while (result.next()) {
+                int studentId = result.getInt("STUDENTID");
+                String firstName = result.getString("firstName");
+                String lastName = result.getString("lastName");
+                String fullName = studentId + "." + firstName + " " + lastName;
+                studentComboBox.addItem(fullName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void refreshCourseCombo() {
+        courseComboBox.removeAllItems();
+        conn = DBConnection.getConnection();
+        String sql = "SELECT COURSEID, courseName, instructor, credits FROM course";
+        try {
+            statement = conn.prepareStatement(sql);
+            result = statement.executeQuery();
+            while (result.next()) {
+                int courseId = result.getInt("COURSEID");
+                String courseName = result.getString("courseName");
+                String instructor = result.getString("instructor");
+                String fullCourse = courseId + "." + courseName + "-" + instructor;
+                courseComboBox.addItem(fullCourse);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

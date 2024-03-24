@@ -8,47 +8,71 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Calendar;
 import java.util.Properties;
 
 public class MyFrame extends JFrame {
+    private Date previousDateOfBirth;
+
     public MyFrame() {
         this.setSize(1500, 900);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLayout(new GridLayout(3, 1));
 
         //upPanel--------------------------------------
-        upPanel.setLayout(new GridLayout(7, 5));
+        upPanel.setLayout(new GridLayout(15, 3));
+
         upPanel.add(firstName);
         upPanel.add(firstNameTF);
+        upPanel.add(new JLabel()); // Празен елемент, за да попълни мястото
+
         upPanel.add(lastName);
         upPanel.add(lastNameTF);
+        upPanel.add(new JLabel());
+
         upPanel.add(age);
         upPanel.add(ageTF);
+        upPanel.add(new JLabel());
+
         upPanel.add(dateOfBirth);
+        upPanel.add(dateOfBirthTF);
         upPanel.add(datePicker);
+
         upPanel.add(gender);
         upPanel.add(genderComboBox);
+        upPanel.add(new JLabel());
+
         upPanel.add(address);
         upPanel.add(addressTF);
+        upPanel.add(new JLabel());
+
         upPanel.add(city);
         upPanel.add(cityTF);
+        upPanel.add(new JLabel());
+
         upPanel.add(state);
         upPanel.add(stateTF);
+        upPanel.add(new JLabel());
+
         upPanel.add(postalCode);
         upPanel.add(postalCodeTF);
+        upPanel.add(new JLabel());
+
         upPanel.add(country);
         upPanel.add(countryTF);
+        upPanel.add(new JLabel());
+
         upPanel.add(email);
         upPanel.add(emailTF);
+        upPanel.add(new JLabel());
+
         upPanel.add(phone);
         upPanel.add(phoneTF);
+        upPanel.add(new JLabel());
 
         this.add(upPanel);
+
 
 
         //midPanel--------------------------------------
@@ -121,6 +145,7 @@ public class MyFrame extends JFrame {
     JTextField firstNameTF = new JTextField();
     JTextField lastNameTF = new JTextField();
     JTextField ageTF = new JTextField();
+    JTextField dateOfBirthTF = new JTextField();
     JTextField addressTF = new JTextField();
     JTextField cityTF = new JTextField();
     JTextField stateTF = new JTextField();
@@ -210,12 +235,58 @@ public class MyFrame extends JFrame {
     }
 
     class EditAction implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
-            // TO DO
+            conn = DBConnection.getConnection();
+            String sql = "UPDATE student SET firstName=?, lastName=?, age=?, dateOfBirth=?, gender=?, address=?, city=?, state=?, postalCode=?, country=?, email=?, phone=? WHERE STUDENTID=?";
+            try {
+                statement = conn.prepareStatement(sql);
+                statement.setString(1, firstNameTF.getText());
+                statement.setString(2, lastNameTF.getText());
+                statement.setInt(3, Integer.parseInt(ageTF.getText()));
+
+                // Проверка за избрана нова дата на раждане
+                java.util.Date selectedDate = (java.util.Date) datePicker.getModel().getValue();
+                java.sql.Date sqlDate;
+                if (selectedDate != null) {
+                    // Ако е избрана нова дата, използвайте я
+                    sqlDate = new java.sql.Date(selectedDate.getTime());
+                } else {
+                    // Ако не е избрана нова дата, използвайте предишната стойност
+                    // Предполагаме, че сте съхранявали предишната дата в променлива previousDateOfBirth
+                    if (previousDateOfBirth != null) {
+                        sqlDate = new java.sql.Date(previousDateOfBirth.getTime());
+                    } else {
+                        // Ако няма предишна стойност, изведете съобщение за грешка
+                        System.out.println("Моля, изберете дата на раждане.");
+                        return;
+                    }
+                }
+                statement.setDate(4, sqlDate);
+
+                statement.setString(5, genderComboBox.getSelectedItem().toString());
+                statement.setString(6, addressTF.getText());
+                statement.setString(7, cityTF.getText());
+                statement.setString(8, stateTF.getText());
+                statement.setString(9, postalCodeTF.getText());
+                statement.setString(10, countryTF.getText());
+                statement.setString(11, emailTF.getText());
+                statement.setString(12, phoneTF.getText());
+                statement.setInt(13, id);
+                statement.executeUpdate();
+                refreshTable();
+                clearForm();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+            }
         }
     }
+
+
+
+
 
     class DeleteAction implements ActionListener{
 
@@ -275,15 +346,16 @@ public class MyFrame extends JFrame {
             id = Integer.parseInt(table.getValueAt(row,0).toString());
             firstNameTF.setText(table.getValueAt(row, 1).toString());
             lastNameTF.setText(table.getValueAt(row, 2).toString());
-            ageTF.setText(table.getValueAt(row,3).toString());
-            addressTF.setText((table.getValueAt(row, 6).toString()));
-            cityTF.setText((table.getValueAt(row, 7).toString()));
-            stateTF.setText((table.getValueAt(row, 8).toString()));
-            postalCodeTF.setText((table.getValueAt(row, 9).toString()));
-            countryTF.setText((table.getValueAt(row, 10).toString()));
-            emailTF.setText((table.getValueAt(row, 11).toString()));
-            phoneTF.setText((table.getValueAt(row, 12).toString()));
-            if(table.getValueAt(row, 5).toString().equals("Мъж")){
+            ageTF.setText(table.getValueAt(row,12).toString());
+            dateOfBirthTF.setText(table.getValueAt(row,3).toString());
+            addressTF.setText((table.getValueAt(row, 5).toString()));
+            cityTF.setText((table.getValueAt(row, 6).toString()));
+            stateTF.setText((table.getValueAt(row, 7).toString()));
+            postalCodeTF.setText((table.getValueAt(row, 8).toString()));
+            countryTF.setText((table.getValueAt(row, 9).toString()));
+            emailTF.setText((table.getValueAt(row, 10).toString()));
+            phoneTF.setText((table.getValueAt(row, 11).toString()));
+            if(table.getValueAt(row, 4).toString().equals("Мъж")){
                 genderComboBox.setSelectedIndex(0);
             }
             else {
@@ -333,6 +405,7 @@ public class MyFrame extends JFrame {
         firstNameTF.setText("");
         lastNameTF.setText("");
         ageTF.setText("");
+        dateOfBirthTF.setText("");
         addressTF.setText("");
         cityTF.setText("");
         stateTF.setText("");
