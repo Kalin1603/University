@@ -25,7 +25,7 @@ public class MyFrame extends JFrame {
 
         upPanel.add(firstName);
         upPanel.add(firstNameTF);
-        upPanel.add(new JLabel()); // Празен елемент, за да попълни мястото
+        upPanel.add(new JLabel());
 
         upPanel.add(lastName);
         upPanel.add(lastNameTF);
@@ -249,11 +249,8 @@ public class MyFrame extends JFrame {
                 java.util.Date selectedDate = (java.util.Date) datePicker.getModel().getValue();
                 java.sql.Date sqlDate;
                 if (selectedDate != null) {
-                    // Ако е избрана нова дата, използвайте я
                     sqlDate = new java.sql.Date(selectedDate.getTime());
                 } else {
-                    // Ако не е избрана нова дата, използвайте предишната стойност
-                    // Предполагаме, че сте съхранявали предишната дата в променлива previousDateOfBirth
                     if (previousDateOfBirth != null) {
                         sqlDate = new java.sql.Date(previousDateOfBirth.getTime());
                     } else {
@@ -283,10 +280,6 @@ public class MyFrame extends JFrame {
             }
         }
     }
-
-
-
-
 
     class DeleteAction implements ActionListener{
 

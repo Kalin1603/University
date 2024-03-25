@@ -15,6 +15,8 @@ import java.util.Properties;
 
 public class EnrollmentFrame extends JFrame {
 
+    private Date previousDateOfBirth;
+
     public EnrollmentFrame() {
         this.setSize(1200, 700);
         this.setLayout(new GridLayout(3, 1));
@@ -121,13 +123,15 @@ public class EnrollmentFrame extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             conn = DBConnection.getConnection();
-            String sql = "insert into ENROLLMENT (ENROLLMENTDATE, GRADE ) values(?, ?)";
+            String sql = "insert into ENROLLMENT (STUDENTID, COURSEID, ENROLLMENTDATE, GRADE ) values(?, ?, ?, ?)";
             try {
                 statement = conn.prepareStatement(sql);
                 java.util.Date selectedDate = (java.util.Date) datePicker.getModel().getValue();
                 java.sql.Date sqlDate = new java.sql.Date(selectedDate.getTime());
-                statement.setDate(1, sqlDate);
-                statement.setDouble(2, Double.parseDouble(gradeTF.getText()));
+                statement.setInt(1,Integer.parseInt(studentComboBox.getSelectedItem().toString().substring(0,studentComboBox.getSelectedItem().toString().indexOf('.'))));
+                statement.setInt(2,Integer.parseInt(courseComboBox.getSelectedItem().toString().substring(0,courseComboBox.getSelectedItem().toString().indexOf('.'))));
+                statement.setDate(3, sqlDate);
+                statement.setDouble(4, Double.parseDouble(gradeTF.getText()));
                 statement.execute();
                 refreshEnrollmentTable();
                 clearForm();
@@ -141,10 +145,36 @@ public class EnrollmentFrame extends JFrame {
     }
 
     class EditAction implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
-            // TO DO
+            conn = DBConnection.getConnection();
+            String sql = "UPDATE enrollment SET  ENROLLMENTDATE = ?, GRADE = ? WHERE ENROLLMENTID = ?";
+            try {
+                statement = conn.prepareStatement(sql);
+                java.util.Date selectedDate = (java.util.Date) datePicker.getModel().getValue();
+                java.sql.Date sqlDate;
+                if (selectedDate != null) {
+                    sqlDate = new java.sql.Date(selectedDate.getTime());
+                } else {
+                    if (previousDateOfBirth != null) {
+                        sqlDate = new java.sql.Date(previousDateOfBirth.getTime());
+                    } else {
+                        // Ако няма предишна стойност, изведете съобщение за грешка
+                        System.out.println("Моля, изберете дата на записване.");
+                        return;
+                    }
+                }
+                statement.setDate(1, sqlDate);
+                statement.setDouble(2, Double.parseDouble(gradeTF.getText()));
+                statement.setInt(3, id);
+                statement.executeUpdate();
+                refreshEnrollmentTable();
+                clearForm();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -175,7 +205,10 @@ public class EnrollmentFrame extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             conn = DBConnection.getConnection();
-            String sql = "select * from enrollment where GRADE = ?";
+            String sql = "SELECT  E.ENROLLMENTID,S.FIRSTNAME, S.LASTNAME, C.COURSENAME, C.INSTRUCTOR, E.ENROLLMENTDATE, E.GRADE \n" +
+                    "                    FROM COURSE AS C \n" +
+                    "                    JOIN ENROLLMENT AS E ON E.COURSEID = C.COURSEID \n" +
+                    "                    JOIN STUDENT AS S ON S.STUDENTID = E.STUDENTID WHERE GRADE = ?";
             try {
                 statement = conn.prepareStatement(sql);
                 statement.setDouble(1,Double.parseDouble(gradeTF.getText()));
@@ -204,7 +237,7 @@ public class EnrollmentFrame extends JFrame {
         public void mouseClicked(MouseEvent e) {
             int row = enrollmentTable.getSelectedRow();
             id = Integer.parseInt(enrollmentTable.getValueAt(row, 0).toString());
-            gradeTF.setText(enrollmentTable.getValueAt(row,1).toString());
+            gradeTF.setText(enrollmentTable.getValueAt(row,6).toString());
         }
 
         @Override
@@ -231,7 +264,10 @@ public class EnrollmentFrame extends JFrame {
     public void refreshEnrollmentTable() {
         conn = DBConnection.getConnection();
         try {
-            statement = conn.prepareStatement("SELECT * FROM ENROLLMENT");
+            statement = conn.prepareStatement("SELECT  E.ENROLLMENTID,S.FIRSTNAME, S.LASTNAME, C.COURSENAME, C.INSTRUCTOR, E.ENROLLMENTDATE, E.GRADE \n" +
+                    "                    FROM COURSE AS C \n" +
+                    "                    JOIN ENROLLMENT AS E ON E.COURSEID = C.COURSEID \n" +
+                    "                    JOIN STUDENT AS S ON S.STUDENTID = E.STUDENTID");
             result = statement.executeQuery();
             enrollmentTable.setModel(new MyModel(result));
         } catch (SQLException e) {

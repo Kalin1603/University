@@ -9,11 +9,11 @@ import java.sql.*;
 public class CourseFrame extends JFrame {
 
     public CourseFrame() {
-        this.setSize(1200, 700);
+        this.setSize(1500, 900);
         this.setLayout(new GridLayout(3, 1));
 
         //upPanel--------------------------------------
-        upPanel.setLayout(new GridLayout(5, 2));
+        upPanel.setLayout(new GridLayout(15, 3));
         upPanel.add(courseName);
         upPanel.add(courseNameTF);
         upPanel.add(instructor);
@@ -23,6 +23,10 @@ public class CourseFrame extends JFrame {
         upPanel.add(description);
         upPanel.add(descriptionTF);
         upPanel.add(studentComboBox);
+        upPanel.add(criteria1);
+        upPanel.add(criteria1TF);
+        upPanel.add(criteria2);
+        upPanel.add(criteria2TF);
 
         this.add(upPanel);
 
@@ -37,6 +41,8 @@ public class CourseFrame extends JFrame {
         searchBtn.addActionListener(new SearchAction());
         midPanel.add(refreshBtn);
         refreshBtn.addActionListener(new RefreshAction());
+        midPanel.add(searchBtnMultipleCriteria);
+        searchBtnMultipleCriteria.addActionListener(new SearchAction());
 
         this.add(midPanel);
 
@@ -64,12 +70,16 @@ public class CourseFrame extends JFrame {
     JLabel instructor = new JLabel("Инструктор");
     JLabel credits = new JLabel("Кредити");
     JLabel description = new JLabel("Описание");
+    JLabel criteria1 = new JLabel("Първи критерий");
+    JLabel criteria2 = new JLabel("Втори критерий");
 
     //Text fields
     JTextField courseNameTF = new JTextField();
     JTextField instructorTF = new JTextField();
     JTextField creditsTF = new JTextField();
     JTextField descriptionTF = new JTextField();
+    JTextField criteria1TF = new JTextField();
+    JTextField criteria2TF = new JTextField();
 
     //Buttons
     JButton addCourse = new JButton("Добави курс");
@@ -77,6 +87,7 @@ public class CourseFrame extends JFrame {
     JButton editButton = new JButton("Редактиране");
     JButton searchBtn = new JButton("Търсене по кредити");
     JButton refreshBtn = new JButton("Обнови");
+    JButton searchBtnMultipleCriteria = new JButton("Търсене по повече от един критерий");
 
     JTable courseTable = new JTable();
     JScrollPane myScroll = new JScrollPane(courseTable);
@@ -104,21 +115,6 @@ public class CourseFrame extends JFrame {
                 statement.setString(4, descriptionTF.getText());
                 statement.executeUpdate();
 
-                // Вземане на избраната стойност от комбобокса
-                String fullName = (String) studentComboBox.getSelectedItem();
-
-                // Разделяне на "studentId", "firstName" и "lastName"
-                String[] parts = fullName.split("\\.");
-                int studentId = Integer.parseInt(parts[0]);
-                String firstName = parts[1].trim().split(" ")[0];
-                String lastName = parts[1].trim().split(" ")[1];
-
-                // Вмъкване на данните в таблицата
-                String insertStudentSql = "INSERT INTO enrollment(studentId, courseId) VALUES (?, LAST_INSERT_ID())";
-                PreparedStatement insertStudentStatement = conn.prepareStatement(insertStudentSql);
-                insertStudentStatement.setInt(1, studentId);
-                insertStudentStatement.executeUpdate();
-
                 refreshCourseTable();
                 clearForm();
 
@@ -130,14 +126,26 @@ public class CourseFrame extends JFrame {
         }
     }
 
-
-
-
     class EditAction implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
-            // TO DO
+            conn = DBConnection.getConnection();
+            String sql = "UPDATE course SET courseName=?, instructor=?, credits=?, description=? WHERE COURSEID = ?";
+            try {
+                statement = conn.prepareStatement(sql);
+                statement.setString(1, courseNameTF.getText());
+                statement.setString(2, instructorTF.getText());
+                statement.setInt(3, Integer.parseInt(creditsTF.getText()));
+                statement.setString(4, descriptionTF.getText());
+                statement.setInt(5, id);
+                statement.executeUpdate();
+                refreshCourseTable();
+                clearForm();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -167,16 +175,11 @@ public class CourseFrame extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             conn = DBConnection.getConnection();
-            String sql = "select * from course where CREDITS = ?";
-            try {
-                statement = conn.prepareStatement(sql);
-                statement.setInt(1,Integer.parseInt(creditsTF.getText()));
-                result = statement.executeQuery();
-                courseTable.setModel(new MyModel(result));
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
+
+            if (e.getSource() == searchBtn) {
+                searchBySingleCriteria();
+            } else if (e.getSource() == searchBtnMultipleCriteria) {
+                searchByMultipleCriteria();
             }
         }
     }
@@ -196,10 +199,10 @@ public class CourseFrame extends JFrame {
         public void mouseClicked(MouseEvent e) {
             int row = courseTable.getSelectedRow();
             id = Integer.parseInt(courseTable.getValueAt(row, 0).toString());
-            courseNameTF.setText(courseTable.getValueAt(row, 1).toString());
-            instructorTF.setText(courseTable.getValueAt(row, 2).toString());
-            creditsTF.setText(courseTable.getValueAt(row,3).toString());
-            descriptionTF.setText((courseTable.getValueAt(row, 4).toString()));
+            courseNameTF.setText(courseTable.getValueAt(row, 3).toString());
+            instructorTF.setText(courseTable.getValueAt(row, 4).toString());
+            creditsTF.setText(courseTable.getValueAt(row,5).toString());
+            descriptionTF.setText((courseTable.getValueAt(row, 6).toString()));
         }
 
         @Override
@@ -223,13 +226,51 @@ public class CourseFrame extends JFrame {
         }
     }
 
+    private void searchBySingleCriteria() {
+        String sql = "SELECT  C.COURSEID,S.FIRSTNAME, S.LASTNAME, C.COURSENAME, C.INSTRUCTOR, C.CREDITS, C.DESCRIPTION \n" +
+                "                    FROM COURSE AS C \n" +
+                "                    JOIN ENROLLMENT AS E ON E.COURSEID = C.COURSEID \n" +
+                "                    JOIN STUDENT AS S ON S.STUDENTID = E.STUDENTID WHERE CREDITS = ?";
+        try {
+            statement = conn.prepareStatement(sql);
+            statement.setInt(1,Integer.parseInt(creditsTF.getText()));
+            result = statement.executeQuery();
+            courseTable.setModel(new MyModel(result));
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void searchByMultipleCriteria() {
+        try {
+            String sql = "SELECT  C.COURSEID,S.FIRSTNAME, S.LASTNAME, C.COURSENAME, C.INSTRUCTOR, C.CREDITS, C.DESCRIPTION \n" +
+                    "                    FROM COURSE AS C \n" +
+                    "                    JOIN ENROLLMENT AS E ON E.COURSEID = C.COURSEID \n" +
+                    "                    JOIN STUDENT AS S ON S.STUDENTID = E.STUDENTID WHERE S.FIRSTNAME = ? AND C.COURSENAME = ?";
+
+            statement = conn.prepareStatement(sql);
+            statement.setString(1, criteria1TF.getText());
+            statement.setString(2, criteria2TF.getText());
+            result = statement.executeQuery();
+            courseTable.setModel(new MyModel(result));
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
     public void refreshCourseTable() {
         conn = DBConnection.getConnection();
         try {
-            statement = conn.prepareStatement("SELECT C.COURSEID, S.STUDENTID, S.FIRSTNAME, S.LASTNAME, C.COURSENAME, C.INSTRUCTOR, C.CREDITS, C.DESCRIPTION " +
-                    "FROM COURSE AS C " +
-                    "JOIN ENROLLMENT AS E ON E.COURSEID = C.COURSEID " +
-                    "JOIN STUDENT AS S ON S.STUDENTID = E.STUDENTID");
+            statement = conn.prepareStatement("SELECT  C.COURSEID,S.FIRSTNAME, S.LASTNAME, C.COURSENAME, C.INSTRUCTOR, C.CREDITS, C.DESCRIPTION \n" +
+                    "                    FROM COURSE AS C \n" +
+                    "                    JOIN ENROLLMENT AS E ON E.COURSEID = C.COURSEID \n" +
+                    "                    JOIN STUDENT AS S ON S.STUDENTID = E.STUDENTID");
 
             result = statement.executeQuery();
             courseTable.setModel(new MyModel(result));
@@ -246,6 +287,8 @@ public class CourseFrame extends JFrame {
         instructorTF.setText("");
         creditsTF.setText("");
         descriptionTF.setText("");
+        criteria1TF.setText("");
+        criteria2TF.setText("");
     }
 
     public void refreshStudentCombo() {
