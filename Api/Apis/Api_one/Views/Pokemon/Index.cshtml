@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "Търсене на покемон";
+}
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: calc(100% - 22px); /* Adjust for padding and border */
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .error {
+            color: red;
+        }
+
+        img {
+            max-width: 150px;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Търсене на покемон</h1>
+
+    <form method="get" action="">
+        <input type="text" name="pokemonName" placeholder="Въведете името на покемона" required />
+        <button type="submit">Търси</button>
+    </form>
+
+    <div id="result">
+        @if (ViewData["error"] != null)
+        {
+            <p class="error">@ViewData["error"]</p>
+        }
+        else if (ViewData["name"] != null)
+        {
+            <h2>Резултати:</h2>
+            <p><strong>Име:</strong> @ViewData["name"]</p>
+            <p><strong>Височина:</strong> @ViewData["height"]</p>
+            <p><strong>Тегло:</strong> @ViewData["weight"]</p>
+            <img src="@ViewData["image"]" alt="Изображение на покемон" />
+        }
+    </div>
+</body>
+</html>

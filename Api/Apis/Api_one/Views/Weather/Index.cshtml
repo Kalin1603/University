@@ -1,0 +1,85 @@
+﻿@{
+    ViewBag.Title = "Проверка на времето";
+}
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        label {
+            margin-right: 10px;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Проверка на времето</h1>
+
+    <form method="get" action="/Weather/Index">
+        <label for="city">Въведи град:</label>
+        <input type="text" id="city" name="city" required placeholder="Пример: София" />
+        <button type="submit">Провери времето</button>
+    </form>
+
+    <div id="result">
+        @if (ViewData["temperature"] != null)
+        {
+            <h2 class="success">Времето в @ViewData["city"]:</h2>
+            <p><strong>Температура:</strong> @ViewData["temperature"] °C</p>
+            <p><strong>Описание:</strong> @ViewData["description"]</p>
+        }
+        else if (ViewData["error"] != null)
+        {
+            <p class="error">@ViewData["error"]</p>
+        }
+    </div>
+</body>
+</html>
