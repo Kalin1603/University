@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using Weather_Pokemon_API.Models;
 
 namespace Api_one.Controllers
 {
@@ -14,6 +15,8 @@ namespace Api_one.Controllers
             var client = new WebClient();
             var body = "";
 
+            Weather weather = new Weather();
+
             if (!string.IsNullOrEmpty(city))
             {
                 try
@@ -23,23 +26,26 @@ namespace Api_one.Controllers
 
                     if (data["cod"].ToString() == "200")
                     {
-                        ViewData["city"] = data["name"];
-                        ViewData["temperature"] = data["main"]["temp"];
-                        ViewData["description"] = data["weather"][0]["description"];
+                        weather.City = data["name"].ToString();
+                        weather.Temperature = (double)data["main"]["temp"];
+                        weather.Description = data["weather"][0]["description"].ToString();
+
+
+                        ViewData["weather"] = weather;
                     }
                     else
                     {
-                        ViewData["error"] = "Градът не е намерен. Моля, опитайте отново.";
+                        ViewData["error"] = "Градът не е намерен.";
                     }
                 }
                 catch (WebException ex)
                 {
-                    ViewData["error"] = "Грешка при заявката към API-то. Моля, опитайте по-късно.";
+                    ViewData["error"] = "Грешка при заявката към API-то";
                 }
             }
 
             ViewData["body"] = body;
-            return View();
+            return View(weather);
         }
     }
 }
