@@ -1,34 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using Weather_Pokemon_API.Models;
 
 public class PokemonController : Controller
 {
     public IActionResult Index(string pokemonName)
     {
+        var url = $"https://pokeapi.co/api/v2/pokemon/{pokemonName}";
+        var client = new WebClient();
+        Pokemon pokemon = new Pokemon();
+
         if (!string.IsNullOrEmpty(pokemonName))
         {
-            var url = $"https://pokeapi.co/api/v2/pokemon/{pokemonName.ToLower()}";
-
-            using (var client = new WebClient())
+            try
             {
-                try
-                {
-                    var json = client.DownloadString(url);
-                    JObject data = JObject.Parse(json);
+                var json = client.DownloadString(url);
+                Console.WriteLine(json);
+                JObject data = JObject.Parse(json);
 
-                    ViewData["name"] = data["name"];
-                    ViewData["height"] = data["height"];
-                    ViewData["weight"] = data["weight"];
-                    ViewData["image"] = data["sprites"]["front_default"];
-                }
-                catch
-                {
-                    ViewData["error"] = "Покемонът не беше намерен.";
-                }
+                pokemon.Name = data["name"].ToString();
+                pokemon.Height = (double)data["height"];
+                pokemon.Weight = (double)data["weight"];
+                pokemon.Image = data["sprites"]["front_default"].ToString();
+
+                ViewData["pokemon"] = pokemon;
+            }
+            catch
+            {
+                ViewData["error"] = "Покемонът не беше намерен.";
             }
         }
-
-        return View();
+        return View(pokemon);
     }
 }

@@ -1,10 +1,10 @@
-using Api_one.Models;
+using Weather_Pokemon_API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.Net;
 
-namespace Api_one.Controllers
+namespace Weather_Pokemon_API.Controllers
 {
     public class HomeController : Controller
     {

@@ -1,4 +1,4 @@
-namespace Api_one.Models
+namespace Weather_Pokemon_API.Models
 {
     public class ErrorViewModel
     {

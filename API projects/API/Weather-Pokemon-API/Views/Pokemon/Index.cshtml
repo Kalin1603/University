@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Weather_Pokemon_API.Models
+@{
     ViewBag.Title = "Търсене на покемон";
 }
 
@@ -28,7 +29,7 @@
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            width: calc(100% - 22px); /* Adjust for padding and border */
+            width: calc(100% - 22px);
         }
 
         button {
@@ -77,13 +78,14 @@
         {
             <p class="error">@ViewData["error"]</p>
         }
-        else if (ViewData["name"] != null)
+        else if (ViewData["pokemon"] != null)
         {
+            var data = (Pokemon)ViewData["pokemon"];
             <h2>Резултати:</h2>
-            <p><strong>Име:</strong> @ViewData["name"]</p>
-            <p><strong>Височина:</strong> @ViewData["height"]</p>
-            <p><strong>Тегло:</strong> @ViewData["weight"]</p>
-            <img src="@ViewData["image"]" alt="Изображение на покемон" />
+            <p><strong>Име:</strong> @data.Name</p>
+            <p><strong>Височина:</strong> @data.Height m</p>
+            <p><strong>Тегло:</strong> @data.Weight kg</p>
+            <img src="@data.Image" alt="Изображение на покемон" />
         }
     </div>
 </body>
