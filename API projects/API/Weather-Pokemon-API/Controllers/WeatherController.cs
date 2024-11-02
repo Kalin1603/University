@@ -7,7 +7,14 @@ namespace Weather_Pokemon_API.Controllers
 {
     public class WeatherController : Controller
     {
-        public ActionResult Index(string city)
+        private readonly WeatherDbContext _weatherDbContext;
+
+        public WeatherController(WeatherDbContext weatherDbContext)
+        {
+            _weatherDbContext = weatherDbContext;
+        }
+
+        public IActionResult Index(string city)
         {
             string apiKey = "81d714e701ffc7b1464fb30405cef137";
 
@@ -27,8 +34,10 @@ namespace Weather_Pokemon_API.Controllers
                         weather.Temperature = (double)data["main"]["temp"];
                         weather.Description = data["weather"][0]["description"].ToString();
 
+                    _weatherDbContext.Add(weather);
+                    _weatherDbContext.SaveChanges();
 
-                        ViewData["weather"] = weather;
+                    ViewData["weather"] = weather;
                 }
                 catch (WebException ex)
                 {
