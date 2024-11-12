@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Гласуване";
+}
+
+<h2>Изберете опция за гласуване:</h2>
+
+<form asp-action="SubmitVote" method="post">
+    <label>
+        <input type="radio" name="option" value="ГЕРБ" />
+        ГЕРБ
+    </label>
+    <br />
+    <label>
+        <input type="radio" name="option" value="ДПС" />
+        ДПС
+    </label>
+    <br />
+    <label>
+        <input type="radio" name="option" value="БСП" />
+        БСП
+    </label>
+    <br />
+    <button type="submit">Гласувай</button>
+</form>
+
+@if (ViewBag.TrackCode != null)
+{
+    <p>Вашият код за проследяване е: <strong>@ViewBag.TrackCode</strong></p>
+}

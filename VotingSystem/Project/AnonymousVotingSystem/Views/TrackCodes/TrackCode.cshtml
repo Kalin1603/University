@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Проследяване на глас";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="TrackVote" method="post">
+    <div class="form-group">
+        <label for="code">Въведете вашия код за проследяване:</label>
+        <input type="text" id="code" name="code" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Проследяване</button>
+</form>
+
+@if (ViewBag.VoteOption != null)
+{
+    <div class="alert alert-success mt-3">
+        Гласуваната опция е: @ViewBag.VoteOption
+    </div>
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger mt-3">
+        @ViewBag.ErrorMessage
+    </div>
+}
