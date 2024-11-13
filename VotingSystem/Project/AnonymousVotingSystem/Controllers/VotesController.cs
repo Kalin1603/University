@@ -45,9 +45,8 @@ namespace AnonymousVotingSystem.Controllers
             await _context.TrackCodes.AddAsync(trackCode);
             await _context.SaveChangesAsync();
 
-            // Добавяме както кода за проследяване, така и самия избор
             ViewBag.TrackCode = trackCode.Code;
-            ViewBag.Option = vote.Option; // Пращаме и избора на потребителя
+            ViewBag.Option = vote.Option; 
 
             return View("VoteResult");
         }
