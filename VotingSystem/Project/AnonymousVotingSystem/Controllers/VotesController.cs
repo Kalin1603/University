@@ -25,6 +25,43 @@ namespace AnonymousVotingSystem.Controllers
             return View(await _context.Votes.ToListAsync());
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SubmitVote(string option)
+        {
+            if (string.IsNullOrEmpty(option))
+            {
+                ModelState.AddModelError(string.Empty, "Моля, изберете опция за гласуване.");
+                return View("Index");
+            }
+
+            var vote = new Vote();
+            vote.Option = option;
+            await _context.Votes.AddAsync(vote);
+            await _context.SaveChangesAsync();
+
+            var trackCode = new TrackCode();
+            trackCode.VoteId = vote.Id;
+            trackCode.Code = Guid.NewGuid().ToString();
+            await _context.TrackCodes.AddAsync(trackCode);
+            await _context.SaveChangesAsync();
+
+            // Добавяме както кода за проследяване, така и самия избор
+            ViewBag.TrackCode = trackCode.Code;
+            ViewBag.Option = vote.Option; // Пращаме и избора на потребителя
+
+            return View("VoteResult");
+        }
+
+        // GET: Votes/AllVotes
+        public async Task<IActionResult> AllVotes()
+        {
+            var votesWithCodes = await _context.Votes
+                .Include(v => v.TrackCode)
+                .ToListAsync();
+
+            return View(votesWithCodes);
+        }
+
         // GET: Votes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -148,36 +185,6 @@ namespace AnonymousVotingSystem.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-        [HttpPost]
-        public async Task<IActionResult> SubmitVote(string option)
-        {
-            if (string.IsNullOrEmpty(option))
-            {
-                ModelState.AddModelError(string.Empty, "Моля, изберете опция за гласуване.");
-                return View("Index");
-            }
-
-            var vote = new Vote();
-            vote.Option = option;
-            await _context.Votes.AddAsync(vote);
-            await _context.SaveChangesAsync();
-
-            var trackCode = new TrackCode();
-            trackCode.VoteId = vote.Id;
-            trackCode.Code = Guid.NewGuid().ToString();
-            await _context.TrackCodes.AddAsync(trackCode);
-            await _context.SaveChangesAsync();
-
-            // Добавяме както кода за проследяване, така и самия избор
-            ViewBag.TrackCode = trackCode.Code;
-            ViewBag.Option = vote.Option; // Пращаме и избора на потребителя
-
-            return View("VoteResult");
-        }
-
-
-
 
         private bool VoteExists(int id)
         {

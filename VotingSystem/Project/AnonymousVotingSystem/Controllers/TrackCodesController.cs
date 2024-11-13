@@ -19,7 +19,7 @@ namespace AnonymousVotingSystem.Controllers
         }
 
         [HttpGet]
-        public IActionResult TrackVote()
+        public IActionResult TrackCode()
         {
             return View(); 
         }

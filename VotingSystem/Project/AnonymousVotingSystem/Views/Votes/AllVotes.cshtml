@@ -1,0 +1,27 @@
+﻿@model IEnumerable<AnonymousVotingSystem.Models.Vote>
+
+@{
+    ViewData["Title"] = "Всички гласове";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Идентификатор на глас</th>
+            <th>Партия</th>
+            <th>Код за проследяване</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var vote in Model)
+        {
+            <tr>
+                <td>@vote.Id</td>
+                <td>@vote.Option</td>
+                <td>@vote.TrackCode.Code</td> 
+            </tr>
+        }
+    </tbody>
+</table>
