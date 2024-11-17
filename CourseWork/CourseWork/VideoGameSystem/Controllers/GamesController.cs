@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VideoGameSystem.Data;
 using VideoGameSystem.Models;
-using PagedList;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace VideoGameSystem.Controllers
 {
@@ -21,13 +18,12 @@ namespace VideoGameSystem.Controllers
             _context = context;
         }
 
-        // GET: Games
         [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Index(string sortOrder, string searchString, int? page)
         {
             var games = _context.Games.AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(searchString) && (User.IsInRole("User") || User.IsInRole("Admin")))
             {
                 games = games.Where(g => g.Title.Contains(searchString));
             }
@@ -50,8 +46,7 @@ namespace VideoGameSystem.Controllers
             return View(pagedGames);
         }
 
-        // GET: Games/Create
-        [Authorize(Roles = "Admin")]  
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["GenreId"] = new SelectList(_context.Genres, "Id", "Name");
@@ -59,9 +54,8 @@ namespace VideoGameSystem.Controllers
             return View();
         }
 
-        // POST: Games/Create
         [HttpPost]
-        [Authorize(Roles = "Admin")]  
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,GenreId,PublisherId,Price,Players")] Game game)
         {
@@ -76,8 +70,7 @@ namespace VideoGameSystem.Controllers
             return View(game);
         }
 
-        // GET: Games/Edit/5
-        [Authorize(Roles = "Admin")]  
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -95,9 +88,8 @@ namespace VideoGameSystem.Controllers
             return View(game);
         }
 
-        // POST: Games/Edit/5
         [HttpPost]
-        [Authorize(Roles = "Admin")]  
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,GenreId,PublisherId,Price,Players")] Game game)
         {
@@ -131,8 +123,7 @@ namespace VideoGameSystem.Controllers
             return View(game);
         }
 
-        // GET: Games/Delete/5
-        [Authorize(Roles = "Admin")]  
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -152,9 +143,8 @@ namespace VideoGameSystem.Controllers
             return View(game);
         }
 
-        // POST: Games/Delete/5
         [HttpPost, ActionName("Delete")]
-        [Authorize(Roles = "Admin")]  
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

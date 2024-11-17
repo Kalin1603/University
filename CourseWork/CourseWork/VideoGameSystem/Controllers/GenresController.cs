@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using VideoGameSystem.Data;
 using VideoGameSystem.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace VideoGameSystem.Controllers
 {
@@ -16,25 +18,22 @@ namespace VideoGameSystem.Controllers
             _context = context;
         }
 
-        // GET: Genres
-        [Authorize(Roles = "Admin, User")] 
+        [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Genres.ToListAsync());
         }
 
-        // GET: Genres/Create
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Genres/Create
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id, Name")] Genre genre)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Genre genre)
         {
             if (ModelState.IsValid)
             {
@@ -45,8 +44,7 @@ namespace VideoGameSystem.Controllers
             return View(genre);
         }
 
-        // GET: Genres/Edit/5
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -62,11 +60,10 @@ namespace VideoGameSystem.Controllers
             return View(genre);
         }
 
-        // POST: Genres/Edit/5
         [HttpPost]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id, Name")] Genre genre)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Genre genre)
         {
             if (id != genre.Id)
             {
@@ -96,8 +93,7 @@ namespace VideoGameSystem.Controllers
             return View(genre);
         }
 
-        // GET: Genres/Delete/5
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -115,9 +111,8 @@ namespace VideoGameSystem.Controllers
             return View(genre);
         }
 
-        // POST: Genres/Delete/5
         [HttpPost, ActionName("Delete")]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -125,8 +120,9 @@ namespace VideoGameSystem.Controllers
             if (genre != null)
             {
                 _context.Genres.Remove(genre);
-                await _context.SaveChangesAsync();
             }
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

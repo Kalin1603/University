@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VideoGameSystem.Data;
 using VideoGameSystem.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace VideoGameSystem.Controllers
 {
@@ -16,25 +17,22 @@ namespace VideoGameSystem.Controllers
             _context = context;
         }
 
-        // GET: Publishers
-        [Authorize(Roles = "Admin, User")] 
+        [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Publishers.ToListAsync());
         }
 
-        // GET: Publishers/Create
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Publishers/Create
         [HttpPost]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id, Name")] Publisher publisher)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Publisher publisher)
         {
             if (ModelState.IsValid)
             {
@@ -45,8 +43,7 @@ namespace VideoGameSystem.Controllers
             return View(publisher);
         }
 
-        // GET: Publishers/Edit/5
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -62,11 +59,10 @@ namespace VideoGameSystem.Controllers
             return View(publisher);
         }
 
-        // POST: Publishers/Edit/5
         [HttpPost]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id, Name")] Publisher publisher)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Publisher publisher)
         {
             if (id != publisher.Id)
             {
@@ -96,8 +92,7 @@ namespace VideoGameSystem.Controllers
             return View(publisher);
         }
 
-        // GET: Publishers/Delete/5
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -115,9 +110,8 @@ namespace VideoGameSystem.Controllers
             return View(publisher);
         }
 
-        // POST: Publishers/Delete/5
         [HttpPost, ActionName("Delete")]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -125,8 +119,9 @@ namespace VideoGameSystem.Controllers
             if (publisher != null)
             {
                 _context.Publishers.Remove(publisher);
-                await _context.SaveChangesAsync();
             }
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
