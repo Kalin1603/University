@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace VideoGameSystem.Data.Migrations
+namespace VideoGameSystem.Migrations
 {
     /// <inheritdoc />
     public partial class Updated : Migration

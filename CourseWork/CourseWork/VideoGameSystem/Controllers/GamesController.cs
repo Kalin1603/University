@@ -21,7 +21,10 @@ namespace VideoGameSystem.Controllers
         [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Index(string sortOrder, string searchString, int? page)
         {
-            var games = _context.Games.AsQueryable();
+            var games = _context.Games
+                        .Include(g => g.Genre)   
+                        .Include(g => g.Publisher)
+                        .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString) && (User.IsInRole("User") || User.IsInRole("Admin")))
             {
@@ -57,9 +60,9 @@ namespace VideoGameSystem.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,GenreId,PublisherId,Price,Players")] Game game)
+        public async Task<IActionResult> Create([Bind("Id,Title,GenreId,PublisherId,Price,Players,ReleaseDate")] Game game)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 _context.Add(game);
                 await _context.SaveChangesAsync();
@@ -91,14 +94,14 @@ namespace VideoGameSystem.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,GenreId,PublisherId,Price,Players")] Game game)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,GenreId,PublisherId,Price,Players,ReleaseDate")] Game game)
         {
             if (id != game.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {
@@ -122,6 +125,28 @@ namespace VideoGameSystem.Controllers
             ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "Name", game.PublisherId);
             return View(game);
         }
+
+        [Authorize(Roles = "Admin, User")]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var game = await _context.Games
+                .Include(g => g.Genre)  
+                .Include(g => g.Publisher) 
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (game == null)
+            {
+                return NotFound();
+            }
+
+            return View(game); 
+        }
+
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)

@@ -33,9 +33,9 @@ namespace VideoGameSystem.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Genre genre)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,AgeRestriction,PopularityRank,AverageRating")] Genre genre)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 _context.Add(genre);
                 await _context.SaveChangesAsync();
@@ -63,14 +63,14 @@ namespace VideoGameSystem.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Genre genre)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,AgeRestriction,PopularityRank,AverageRating")] Genre genre)
         {
             if (id != genre.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {
@@ -92,6 +92,25 @@ namespace VideoGameSystem.Controllers
             }
             return View(genre);
         }
+
+        [Authorize(Roles = "Admin, User")]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var genre = await _context.Genres
+                .FirstOrDefaultAsync(m => m.Id == id);  
+            if (genre == null)
+            {
+                return NotFound();
+            }
+
+            return View(genre); 
+        }
+
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)

@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace VideoGameSystem.Data.Migrations
+namespace VideoGameSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class AddRolesAndUsers : Migration
+    public partial class FinalUpdated : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

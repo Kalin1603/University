@@ -14,6 +14,12 @@ namespace VideoGameSystem.Models
         [StringLength(50)]
         public string Country { get; set; }
 
+        public int NumberOfEmployees { get; set; }
+
+        public DateTime PartnershipDate { get; set; }
+
+        public string Website { get; set; }
+
         public ICollection<Game> Games { get; set; }
     }
 }

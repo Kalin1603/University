@@ -32,16 +32,26 @@ namespace VideoGameSystem.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Publisher publisher)
+        public async Task<IActionResult> Create([Bind("Id,Name,Country,NumberOfEmployees,PartnershipDate,Website")] Publisher publisher)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 _context.Add(publisher);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            else
+            {
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"Error: {error.ErrorMessage}");
+                }
+            }
+
             return View(publisher);
         }
+
+
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
@@ -62,14 +72,14 @@ namespace VideoGameSystem.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Publisher publisher)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Country,NumberOfEmployees,PartnershipDate,Website")] Publisher publisher)
         {
             if (id != publisher.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {
@@ -91,6 +101,26 @@ namespace VideoGameSystem.Controllers
             }
             return View(publisher);
         }
+
+        [Authorize(Roles = "Admin, User")]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var publisher = await _context.Publishers
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (publisher == null)
+            {
+                return NotFound();
+            }
+
+            return View(publisher); 
+        }
+
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)

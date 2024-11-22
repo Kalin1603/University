@@ -23,6 +23,18 @@
                 <span asp-validation-for="Country" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="NumberOfEmployees" class="control-label"></label>
+                <input asp-for="NumberOfEmployees" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="PartnershipDate" class="control-label"></label>
+                <input asp-for="PartnershipDate" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Website" class="control-label"></label>
+                <input asp-for="Website" class="form-control" />
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
@@ -34,5 +46,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

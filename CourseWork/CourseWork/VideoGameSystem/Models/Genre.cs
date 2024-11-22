@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Configuration;
 
 namespace VideoGameSystem.Models
 {
@@ -13,6 +14,14 @@ namespace VideoGameSystem.Models
 
         [StringLength(250)]
         public string Description { get; set; }
+
+        [Required]
+        [Range(2,18)]
+        public int AgeRestriction { get; set; }
+
+        public int PopularityRank { get; set; }
+
+        public double AverageRating { get; set; }
 
         public ICollection<Game> Games { get; set; }
     }
