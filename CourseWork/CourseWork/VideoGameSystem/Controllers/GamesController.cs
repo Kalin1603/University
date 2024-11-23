@@ -60,7 +60,7 @@ namespace VideoGameSystem.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,GenreId,PublisherId,Price,Players,ReleaseDate")] Game game)
+        public async Task<IActionResult> Create([Bind("Id,Title,GenreId,PublisherId,Price,Players,ReleaseDate, ImageUrl")] Game game)
         {
             if (!ModelState.IsValid)
             {
@@ -94,7 +94,7 @@ namespace VideoGameSystem.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,GenreId,PublisherId,Price,Players,ReleaseDate")] Game game)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,GenreId,PublisherId,Price,Players,ReleaseDate, ImageUrl")] Game game)
         {
             if (id != game.Id)
             {

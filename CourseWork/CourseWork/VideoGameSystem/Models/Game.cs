@@ -36,5 +36,7 @@ namespace VideoGameSystem.Models
 
         [Required]
         public DateTime ReleaseDate { get; set; }
+
+        public string ImageUrl { get; set; }
     }
 }

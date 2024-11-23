@@ -1,8 +1,38 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using VideoGameSystem.ViewModels
+@model HomeViewModel
+
+@{
+    ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="game-container">
+    <h1 class="title">Collection of games</h1>
+
+    @if (Model.Games != null && Model.Games.Any())
+    {
+        <div class="game-list">
+            @foreach (var game in Model.Games)
+            {
+                <div class="game-card">
+                    <img src="@game.ImageUrl" alt="Game image" class="game-img">
+                    <div class="game-info">
+                        <h5 class="game-title">@game.Title</h5>
+                        <p class="game-details">
+                            <strong>Genre:</strong> @game.Genre.Name <br>
+                            <strong>Publisher:</strong> @game.Publisher.Name <br>
+                            <strong>Price:</strong> @game.Price.ToString("C") <br>
+                            <strong>Game for:</strong> @game.Players <strong>players</strong> <br>
+                            <strong>Release date:</strong> @game.ReleaseDate.ToString("dd MMM yyyy")
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No available games at the moment.</p>
+    }
 </div>
+
+<link href="~/css/homestyle.css" rel="stylesheet" />
