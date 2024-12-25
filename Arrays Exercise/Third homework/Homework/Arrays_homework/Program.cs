@@ -122,6 +122,181 @@ static List<int> RemoveNegatives(List<int> numbers)
 }
 */
 
+//4. Задача
+/*
+var list = new DoublyLinkedList<int>();
+list.Add(1);
+list.Add(2);
+list.Add(3);
+list.AddAt(1, 5); 
+list.Remove(2);   
+Console.WriteLine(list.GetAt(1));
+Console.WriteLine(string.Join(", ", list.ToArray())); 
+
+public class DoublyLinkedList<T>
+{
+    private class Node
+    {
+        public T Value;
+        public Node? Prev;
+        public Node? Next;
+
+        public Node(T value)
+        {
+            Value = value;
+        }
+    }
+
+    private Node? head;
+    private Node? tail;
+    private int count;
+
+    public void Add(T value)
+    {
+        var newNode = new Node(value);
+
+        if (head == null)
+        {
+            head = tail = newNode;
+        }
+        else
+        {
+            tail!.Next = newNode;
+            newNode.Prev = tail;
+            tail = newNode;
+        }
+
+        count++;
+    }
+
+    public bool Remove(T value)
+    {
+        var current = head;
+
+        while (current != null)
+        {
+            if (current.Value!.Equals(value))
+            {
+                if (current.Prev != null)
+                    current.Prev.Next = current.Next;
+                else
+                    head = current.Next;
+
+                if (current.Next != null)
+                    current.Next.Prev = current.Prev;
+                else
+                    tail = current.Prev;
+
+                count--;
+                return true;
+            }
+
+            current = current.Next;
+        }
+
+        return false;
+    }
+
+    public int IndexOf(T value)
+    {
+        var current = head;
+        int index = 0;
+
+        while (current != null)
+        {
+            if (current.Value!.Equals(value))
+                return index;
+
+            current = current.Next;
+            index++;
+        }
+
+        return -1; 
+    }
+
+    public void AddAt(int index, T value)
+    {
+        if (index < 0 || index > count)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        var newNode = new Node(value);
+
+        if (index == 0)
+        {
+            if (head == null)
+            {
+                head = tail = newNode;
+            }
+            else
+            {
+                newNode.Next = head;
+                head.Prev = newNode;
+                head = newNode;
+            }
+        }
+        else if (index == count)
+        {
+            Add(value); 
+        }
+        else
+        {
+            var current = head;
+            for (int i = 0; i < index; i++)
+                current = current!.Next;
+
+            newNode.Prev = current!.Prev;
+            newNode.Next = current;
+
+            current.Prev!.Next = newNode;
+            current.Prev = newNode;
+        }
+
+        count++;
+    }
+
+    public T GetAt(int index)
+    {
+        if (index < 0 || index >= count)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        var current = head;
+        for (int i = 0; i < index; i++)
+            current = current!.Next;
+
+        return current!.Value;
+    }
+
+    public T[] ToArray()
+    {
+        var array = new T[count];
+        var current = head;
+        int i = 0;
+
+        while (current != null)
+        {
+            array[i++] = current.Value;
+            current = current.Next;
+        }
+
+        return array;
+    }
+
+    public override string ToString()
+    {
+        var current = head;
+        var result = "";
+
+        while (current != null)
+        {
+            result += current.Value + " ";
+            current = current.Next;
+        }
+
+        return result.Trim();
+    }
+}
+*/
+
 //5. Задача
 /*
 int[] arr = { 1, 2, 4, 11, 12, 8 };
@@ -194,5 +369,75 @@ static void MarkRegion(char[,] canvas, int row, int col, char symbol)
     MarkRegion(canvas, row + 1, col, symbol);
     MarkRegion(canvas, row, col - 1, symbol);
     MarkRegion(canvas, row, col + 1, symbol);
+}
+*/
+
+//7. Задача
+/*
+string inputTree1 = "10,5,15,2,null,12,17";
+string inputTree2 = "10,5,15,null,null,9,17";
+
+Console.WriteLine(IsBinarySearchTree(ParseTreeFromInput(inputTree1)) ? "True" : "False");
+Console.WriteLine(IsBinarySearchTree(ParseTreeFromInput(inputTree2)) ? "True" : "False");
+
+TreeNode? ParseTreeFromInput(string input)
+{
+    var values = input.Split(',');
+    if (values.Length == 0 || values[0] == "null") return null;
+
+    var root = new TreeNode(int.Parse(values[0]));
+    var queue = new Queue<TreeNode>();
+    queue.Enqueue(root);
+    int i = 1;
+
+    while (queue.Count > 0 && i < values.Length)
+    {
+        var current = queue.Dequeue();
+
+        if (i < values.Length && values[i] != "null")
+        {
+            current.Left = new TreeNode(int.Parse(values[i]));
+            queue.Enqueue(current.Left);
+        }
+        i++;
+
+        if (i < values.Length && values[i] != "null")
+        {
+            current.Right = new TreeNode(int.Parse(values[i]));
+            queue.Enqueue(current.Right);
+        }
+        i++;
+    }
+
+    return root;
+}
+
+bool IsBinarySearchTree(TreeNode? root)
+{
+    return ValidateBinarySearchTree(root, null, null);
+}
+
+bool ValidateBinarySearchTree(TreeNode? node, int? min, int? max)
+{
+    if (node == null) return true;
+
+    if ((min.HasValue && node.Value <= min.Value) || (max.HasValue && node.Value >= max.Value))
+    {
+        return false;
+    }
+
+    return ValidateBinarySearchTree(node.Left, min, node.Value) && ValidateBinarySearchTree(node.Right, node.Value, max);
+}
+
+public class TreeNode
+{
+    public int? Value { get; set; }
+    public TreeNode? Left { get; set; }
+    public TreeNode? Right { get; set; }
+
+    public TreeNode(int? value)
+    {
+        Value = value;
+    }
 }
 */
